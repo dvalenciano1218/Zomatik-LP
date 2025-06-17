@@ -2,25 +2,38 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('contactForm');
   const feedback = document.getElementById('formFeedback');
 
-  form.addEventListener('submit', e => {
+  form.addEventListener('submit', async e => {
     e.preventDefault();
 
-    const firstName   = form.firstName.value.trim();
-    const lastName    = form.lastName.value.trim();
-    const email       = form.email.value.trim();
-    const companyType = form.companyType.value;
-    const companySize = form.companySize.value;
-    const urgency     = form.urgency.value;
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
 
-    if (!firstName || !lastName || !email || !companyType || !companySize || !urgency) {
+    const requiredFields = ['firstName', 'lastName', 'email', 'companyType', 'companySize', 'urgency'];
+    const allFilled = requiredFields.every(field => data[field]?.trim() !== '');
+
+    if (!allFilled) {
       feedback.textContent = 'Por favor completa todos los campos requeridos.';
       feedback.style.color = 'var(--accent2)';
       return;
     }
 
-    // Aquí podrías enviar los datos a tu API o servicio de correo
-    feedback.textContent = '¡Gracias! Hemos recibido tu solicitud. Nos pondremos en contacto pronto.';
-    feedback.style.color = 'var(--accent)';
-    form.reset();
+    try {
+      const response = await fetch('https://dvalenciano.app.n8n.cloud/webhook-test/b31f158a-f887-4456-88a1-a577ecaadd3d', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.ok) {
+        feedback.textContent = '¡Gracias! Hemos recibido tu solicitud. Nos pondremos en contacto pronto.';
+        feedback.style.color = 'var(--accent)';
+        form.reset();
+      } else {
+        feedback.textContent = 'Ocurrió un error al enviar el formulario. Intenta de nuevo.';
+        feedback.style.color = 'red';
+      }
+    } catch (error) {
+      feedback.textContent = 'Error de conexión. Verifica tu red o contacta al soporte.';
+      feedback.style.color = 'red';
+    }
   });
 });
