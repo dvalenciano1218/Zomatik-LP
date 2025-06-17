@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     try {
-      const response = await fetch('https://dvalenciano.app.n8n.cloud/webhook-test/b31f158a-f887-4456-88a1-a577ecaadd3d', {
+      const response = await fetch('https://dvalenciano.app.n8n.cloud/webhook-test/lead-zomatik', {
         method: 'POST',
         body: formData
       });
